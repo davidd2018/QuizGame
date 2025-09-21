@@ -7,6 +7,10 @@ package view;
 //import javax.swing.ImageIcon;
 
 import java.awt.Component;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.DefaultListCellRenderer;
@@ -377,13 +381,47 @@ public class Register extends javax.swing.JFrame {
 
     private void dangky_bttnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dangky_bttnActionPerformed
         // TODO add your handling code here:
-        String username = txt_Username.getText();
-        String pass = new String(txt_Password.getPassword()).trim();
-        
-        if(username.isEmpty() || pass.isEmpty())
-        {
-            JOptionPane.showMessageDialog(null,"Error");
+         try {
+        Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");//NHỚ CÀI mssql-jdbc-12.6.1.jre11.jar, tui có để trong file gửi trên zalo á
+
+        String url = "jdbc:sqlserver://localhost:1433;"
+           + "databaseName=QuizGame;"
+           + "encrypt=true;"
+           + "trustServerCertificate=true;";
+
+        Connection con = DriverManager.getConnection(url, "sa", "sa");//username cùng vs pass
+
+        String sql = "INSERT INTO Account (Username, Password, Avatar) VALUES (?, ?, ?)";//lệnh query
+        PreparedStatement pst = con.prepareStatement(sql);
+
+        String username = txt_Username.getText().trim();
+        String password = new String(txt_Password.getPassword()).trim();
+        String selectedAvatar = cbAvatar.getSelectedItem().toString();
+
+        if (username.isEmpty() || password.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Username and Password cannot be empty!", "Error", JOptionPane.ERROR_MESSAGE);//để trống 1 trong 2 hay cả 2 đều báo lỗi
+            return;
         }
+        pst.setString(1, username);//set thứ tự (index) truyền vào dữ liệu ở đây thì username sẽ được vào đầu tiên sau đó là pass
+        pst.setString(2, password);
+        pst.setString(3,selectedAvatar);
+        ResultSet rs = pst.executeQuery();
+
+        if (rs.next()) {
+            JOptionPane.showMessageDialog(this, "Login Successful!");
+        } else {
+            JOptionPane.showMessageDialog(this, "Invalid Username or Password!", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+
+        rs.close();
+        pst.close();
+        con.close();
+
+    } catch (Exception e) {
+        e.printStackTrace(); // good for debugging
+        JOptionPane.showMessageDialog(this, "Database error: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+    }
+        
     }//GEN-LAST:event_dangky_bttnActionPerformed
 
     /**

@@ -314,27 +314,27 @@ public class Login extends javax.swing.JFrame {
     private void Login_bttnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_Login_bttnActionPerformed
         // TODO add your handling code here:
        try {
-        Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+        Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");//NHỚ CÀI mssql-jdbc-12.6.1.jre11.jar, tui có để trong file gửi trên zalo á
 
         String url = "jdbc:sqlserver://localhost:1433;"
            + "databaseName=QuizGame;"
            + "encrypt=true;"
            + "trustServerCertificate=true;";
 
-        Connection con = DriverManager.getConnection(url, "sa", "sa");
+        Connection con = DriverManager.getConnection(url, "sa", "sa");//username cùng vs pass
 
-        String sql = "SELECT * FROM Account WHERE Username = ? AND Password = ?";
+        String sql = "SELECT * FROM Account WHERE Username = ? AND Password = ?";//lệnh query
         PreparedStatement pst = con.prepareStatement(sql);
 
         String username = txt_Username.getText().trim();
         String password = new String(txt_Password.getPassword()).trim();
 
         if (username.isEmpty() || password.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Username and Password cannot be empty!", "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Username and Password cannot be empty!", "Error", JOptionPane.ERROR_MESSAGE);//để trống 1 trong 2 hay cả 2 đều báo lỗi
             return;
         }
 
-        pst.setString(1, username);
+        pst.setString(1, username);//set thứ tự (index) truyền vào dữ liệu ở đây thì username sẽ được vào đầu tiên sau đó là pass
         pst.setString(2, password);
         ResultSet rs = pst.executeQuery();
 
@@ -344,6 +344,8 @@ public class Login extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(this, "Invalid Username or Password!", "Error", JOptionPane.ERROR_MESSAGE);
         }
 
+        //khi sử dụng xong các phương thức thì phải close 
+        //Giống như trong .NET
         rs.close();
         pst.close();
         con.close();
