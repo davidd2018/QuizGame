@@ -5,13 +5,16 @@
 package view;
 
 import Connection.DBAccess;
-import Connection.MyConnection;
-import com.mysql.jdbc.Connection;
-import com.mysql.jdbc.PreparedStatement;
 import javax.swing.JFrame;
 import java.sql.ResultSet;
 import javax.swing.JOptionPane;
+import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+
+
+
 
 /**
  *
@@ -19,9 +22,10 @@ import java.sql.DriverManager;
  */
 public class Login extends javax.swing.JFrame {
 
-     private static final String URL = "jdbc:sqlserver://WINDOWS-PC\\SQLEXPRESS:1433;databaseName=QuizGame;encrypt=true;trustServerCertificate=true;";
+    private static final String URL = "jdbc:sqlserver://WINDOWS-PC\\SQLEXPRESS:1433;databaseName=QuizGame;encrypt=true;trustServerCertificate=true;";
     private static final String USER = "sa"; // your SQL login
     private static final String PASSWORD = "sa";
+    private java.sql.Connection con;
     /**
      * Creates new form Welcome
      */
@@ -155,6 +159,11 @@ public class Login extends javax.swing.JFrame {
         Login_bttn.setForeground(new java.awt.Color(255, 255, 255));
         Login_bttn.setText("Đăng nhập");
         Login_bttn.setBorderPainted(false);
+        Login_bttn.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                Login_bttnMouseClicked(evt);
+            }
+        });
         Login_bttn.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 Login_bttnActionPerformed(evt);
@@ -304,6 +313,49 @@ public class Login extends javax.swing.JFrame {
 
     private void Login_bttnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_Login_bttnActionPerformed
         // TODO add your handling code here:
+       try {
+        Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+
+        String url = "jdbc:sqlserver://localhost:1433;"
+           + "databaseName=QuizGame;"
+           + "encrypt=true;"
+           + "trustServerCertificate=true;";
+
+        Connection con = DriverManager.getConnection(url, "sa", "sa");
+
+        String sql = "SELECT * FROM Account WHERE Username = ? AND Password = ?";
+        PreparedStatement pst = con.prepareStatement(sql);
+
+        String username = txt_Username.getText().trim();
+        String password = new String(txt_Password.getPassword()).trim();
+
+        if (username.isEmpty() || password.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Username and Password cannot be empty!", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        pst.setString(1, username);
+        pst.setString(2, password);
+        ResultSet rs = pst.executeQuery();
+
+        if (rs.next()) {
+            JOptionPane.showMessageDialog(this, "Login Successful!");
+        } else {
+            JOptionPane.showMessageDialog(this, "Invalid Username or Password!", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+
+        rs.close();
+        pst.close();
+        con.close();
+
+    } catch (Exception e) {
+        e.printStackTrace(); // good for debugging
+        JOptionPane.showMessageDialog(this, "Database error: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+    }
+    }//GEN-LAST:event_Login_bttnActionPerformed
+
+    private void Login_bttnMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_Login_bttnMouseClicked
+        // TODO add your handling code here:
         try{
             String username = txt_Username.getText();
             String password = String.valueOf(txt_Password.getPassword());
@@ -314,9 +366,9 @@ public class Login extends javax.swing.JFrame {
             }
             
 
-            DBAccess acc=new DBAccess();
+            DBAccess acc = new DBAccess();
             ResultSet rs = acc.Query("SELECT * FROM Account WHERE Username = '" + username + "' AND Password = '" + password + "'");
-//"select * from Account where Username = ('"+username+"' and '"+password+"')"
+                                        //"select * from Account where Username = ('"+username+"' and '"+password+"')"
             if(rs.next())
             {
                 JOptionPane.showMessageDialog(null, "Success");
@@ -324,7 +376,7 @@ public class Login extends javax.swing.JFrame {
                  JOptionPane.showMessageDialog(null, "Error");
             }
         }catch(Exception e){}
-    }//GEN-LAST:event_Login_bttnActionPerformed
+    }//GEN-LAST:event_Login_bttnMouseClicked
 
     
     /**

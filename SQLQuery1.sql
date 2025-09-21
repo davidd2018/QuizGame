@@ -9,3 +9,5 @@ CREATE TABLE Account (
     Password NVARCHAR(255) NOT NULL,          -- password (store hash, not plain text)
     Avatar NVARCHAR(255) NULL                 -- avatar file path or URL
 );
+
+select * from Account

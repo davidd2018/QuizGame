@@ -5,7 +5,7 @@
 package view;
 
 //import javax.swing.ImageIcon;
-import com.mysql.jdbc.Connection;
+
 import java.awt.Component;
 import java.util.ArrayList;
 import java.util.List;
@@ -29,7 +29,7 @@ public class Register extends javax.swing.JFrame {
     /**
      * Creates new form Welcome
      */
-    private Connection conn;
+    
     
     public Register() {
         initComponents();
